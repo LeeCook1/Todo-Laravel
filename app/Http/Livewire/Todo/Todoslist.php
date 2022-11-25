@@ -7,13 +7,19 @@ use App\Models\Todo;
 
 class Todoslist extends Component
 {
-    public $incomplete, $complete, $title;
+    public string $title = '';
+    protected $listeners = [
+        'refreshParent' => '$refresh'
+    ];
+
     public function render()
     {
-        $this->incomplete = Todo::where('status',0)->oldest('status')->get();
-        $this->complete = Todo::where('status',1)->oldest('status')->get();
-
-        return view('livewire.todo.todoslist');
+        return view('livewire.todo.todoslist',[
+            'todos' => [
+                'incomplete' => Todo::where('status',0)->oldest('status')->get(),
+                'complete' => Todo::where('status',1)->oldest('status')->get()
+            ]
+        ]);
     }
 
     public function store()
@@ -23,10 +29,12 @@ class Todoslist extends Component
         ]);
 
         Todo::create([
-            'title' => $this->title
+            'title' => $this->title,
+            'status' => 0
         ]);
 
-        session()->flash('message', 'Todo Created Successfully');
         $this->reset('title');
     }
+
+
 }
